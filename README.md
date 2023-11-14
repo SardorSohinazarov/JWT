@@ -1,2 +1,2 @@
 # JWT
-sample project cha
+using JWT Bearer
