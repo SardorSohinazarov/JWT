@@ -50,6 +50,7 @@ static TokenValidationParameters GetTokenValidationParameters(IConfiguration con
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+        ClockSkew = TimeSpan.Zero,
     };
 }

@@ -27,6 +27,8 @@ namespace JWT.Services
             if (additionalClaims?.Any() == true)
                 claims.AddRange(additionalClaims);
 
+
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: "*",

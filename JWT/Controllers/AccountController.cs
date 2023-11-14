@@ -64,7 +64,7 @@ namespace JWT.Controllers
             return Ok(
                 new
                 {
-                    CurrentUser = role,
+                    CurrentUserRole = role,
                     Users = await _context.Users.ToListAsync()
                 });
         }
