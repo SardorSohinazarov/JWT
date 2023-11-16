@@ -6,32 +6,32 @@ using System.Text;
 
 namespace JWT.Services
 {
-    public class JWTTokenService
+    public class TokenService:ITokenService
     {
         private IConfiguration _configuration;
 
-        public JWTTokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration)
             => _configuration = configuration;
 
         public string GenerateJWT(IEnumerable<Claim> additionalClaims = null)
         {
-            var securityKey = GetSecurityKey(_configuration);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Sardor:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var expireInMinutes = Convert.ToInt32(_configuration["Jwt:ExpireInMinutes"] ?? "60");
+            var expireInMinutes = Convert.ToInt32(_configuration["Sardor:ExpireInMinutes"] ?? "60");
 
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
+                
             };
 
             if (additionalClaims?.Any() == true)
                 claims.AddRange(additionalClaims);
 
-
-
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: "*",
+                issuer: _configuration["Sardor:Issuer"],
+                audience: _configuration["Sardor:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(expireInMinutes),
                 signingCredentials: credentials);
@@ -39,24 +39,15 @@ namespace JWT.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateJWT(User user, IEnumerable<Claim> additionalClaims = null)
+        public string GenerateJWT(User user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Fullname.ToString()),
                 new Claim("UserName", user.Username.ToString()),
-                new Claim("Password", user.Password.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 
-            if (additionalClaims?.Any() == true)
-                claims.AddRange(additionalClaims);
-
             return GenerateJWT(claims);
         }
-
-        private static SymmetricSecurityKey GetSecurityKey(IConfiguration configuration)
-            => new(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
     }
 }

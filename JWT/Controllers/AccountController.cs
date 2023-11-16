@@ -14,26 +14,30 @@ namespace JWT.Controllers
     public class AccountController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly JWTTokenService _jwtTokenService;
+        private readonly ITokenService _jwtTokenService;
+        private readonly IPasswordHasher _passwordHasher;
 
         public AccountController(
-            AppDbContext context, 
-            JWTTokenService jwtTokenService)
+            AppDbContext context,
+            ITokenService jwtTokenService,
+            IPasswordHasher passwordHasher)
         {
             _context = context;
             _jwtTokenService = jwtTokenService;
+            _passwordHasher = passwordHasher;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(user => user.Password == loginDTO.Password && user.Username == loginDTO.Username);
+                .FirstOrDefaultAsync(user => user.Username == loginDTO.Username);
 
             if (user == null)
-            {
                 return NotFound("Chiqmadi");
-            }
+
+            if (!_passwordHasher.Verify(user.PasswordHash, loginDTO.Password, user.Salt))
+                throw new Exception("Username or password is not valid");
 
             return Ok(_jwtTokenService.GenerateJWT(user));
         }
@@ -41,14 +45,19 @@ namespace JWT.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
+            var salt = Guid.NewGuid().ToString();
+            var PasswordHash = _passwordHasher.Encrypt(registerDTO.Password, salt);
+
             var user = new User
             {
                 Fullname = registerDTO.Fullname,
                 Email = registerDTO.Email,
                 Username = registerDTO.Username,
-                Password = registerDTO.Password,
                 Role = registerDTO.Role,
+                Salt = salt,
+                PasswordHash = PasswordHash
             };
+
 
             var entityEntry = await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
