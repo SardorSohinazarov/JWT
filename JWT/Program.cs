@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,19 +45,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(
         options =>
         {
-            options.TokenValidationParameters
-            = GetTokenValidationParameters(builder.Configuration);
+            options.TokenValidationParameters = GetTokenValidationParameters(builder.Configuration);
+
             options.Events = new JwtBearerEvents
-            {
-                OnAuthenticationFailed = (context) =>
                 {
-                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    OnAuthenticationFailed = (context) =>
                     {
-                        context.Response.Headers.Add("IsTokenExpired", "true");
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("IsTokenExpired", "true");
+                        }
+                        return Task.CompletedTask;
                     }
-                    return Task.CompletedTask;
-                }
-            };
+                };
         });
 
 var app = builder.Build();
@@ -79,12 +80,12 @@ static TokenValidationParameters GetTokenValidationParameters(IConfiguration con
     return new TokenValidationParameters()
     {
         ValidateIssuer = true,
-        ValidIssuer = configuration["Sardor:Issuer"],
+        ValidIssuer = configuration["JWT:Issuer"],
         ValidateAudience = true,
-        ValidAudience = configuration["Sardor:Audience"],
+        ValidAudience = configuration["JWT:Audience"],
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Sardor:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"])),
         ClockSkew = TimeSpan.Zero,
     };
 }

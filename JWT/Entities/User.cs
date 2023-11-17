@@ -9,6 +9,8 @@
 
         public string PasswordHash { get; set; }
         public string Salt { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpireDate { get; set; }
 
         public Role Role { get; set; }
     }

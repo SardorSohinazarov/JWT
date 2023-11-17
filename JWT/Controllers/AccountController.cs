@@ -5,6 +5,7 @@ using JWT.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Security.Claims;
 
 namespace JWT.Controllers
@@ -39,7 +40,14 @@ namespace JWT.Controllers
             if (!_passwordHasher.Verify(user.PasswordHash, loginDTO.Password, user.Salt))
                 throw new Exception("Username or password is not valid");
 
-            return Ok(_jwtTokenService.GenerateJWT(user));
+            return Ok(
+            new TokenDTO()
+            {
+                 AccessToken = _jwtTokenService.GenerateJWT(user),
+                 RefreshToken = user.RefreshToken,
+                 ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2),
+             }
+            );
         }
 
         [HttpPost]
@@ -55,14 +63,31 @@ namespace JWT.Controllers
                 Username = registerDTO.Username,
                 Role = registerDTO.Role,
                 Salt = salt,
-                PasswordHash = PasswordHash
+                PasswordHash = PasswordHash,
+                RefreshToken = Guid.NewGuid().ToString(),
+                RefreshTokenExpireDate = DateTime.Now.AddMinutes(2)
             };
 
 
             var entityEntry = await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            return Ok(_jwtTokenService.GenerateJWT(entityEntry.Entity));
+            return Ok(
+                new TokenDTO()
+                {
+                    AccessToken = _jwtTokenService.GenerateJWT(entityEntry.Entity),
+                    RefreshToken = user.RefreshToken,
+                    ExpireDate = user.RefreshTokenExpireDate?? DateTime.Now.AddMinutes(2),
+                }
+               );
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RefreshTokenAsync(RefreshTokenDTO refreshTokenDTO)
+        {
+            var token = await _jwtTokenService.RefreshToken(refreshTokenDTO);
+
+            return Ok(token);
         }
 
         [Authorize(Roles = "Admin")]
@@ -70,6 +95,7 @@ namespace JWT.Controllers
         public async Task<IActionResult> GetUser()
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
+
             return Ok(
                 new
                 {
