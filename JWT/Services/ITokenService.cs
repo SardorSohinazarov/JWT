@@ -1,7 +1,5 @@
 ﻿using JWT.DTOs;
 using JWT.Entities;
-using System.Linq.Expressions;
-using System.Security.Claims;
 
 namespace JWT.Services
 {

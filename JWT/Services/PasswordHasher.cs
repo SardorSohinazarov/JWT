@@ -10,11 +10,11 @@ namespace JWT.Services
 
         public string Encrypt(string password, string salt)
         {
-            using(var algorithm = new Rfc2898DeriveBytes(
+            using (var algorithm = new Rfc2898DeriveBytes(
                 password: password,
-                salt:Encoding.UTF8.GetBytes(salt),
-                iterations:IterationsCount,
-                hashAlgorithm:HashAlgorithmName.SHA256))
+                salt: Encoding.UTF8.GetBytes(salt),
+                iterations: IterationsCount,
+                hashAlgorithm: HashAlgorithmName.SHA256))
             {
                 var bytes = algorithm.GetBytes(KeySize);
                 return Convert.ToBase64String(bytes);

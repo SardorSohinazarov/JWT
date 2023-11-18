@@ -1,6 +1,4 @@
-﻿using JWT.Entities;
-
-namespace JWT.DTOs
+﻿namespace JWT.DTOs
 {
     public class UpdateUserDTO
     {

@@ -4,7 +4,6 @@ using JWT.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 
@@ -52,6 +51,7 @@ namespace JWT.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                //new Claim(ClaimTypes.Role, user.Roles),
             };
 
             return GenerateJWT(claims);
@@ -102,7 +102,7 @@ namespace JWT.Services
             {
                 AccessToken = newAccessToken,
                 RefreshToken = user.RefreshToken,
-                ExpireDate = user.RefreshTokenExpireDate?? DateTime.Now.AddMinutes(2)
+                ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2)
             };
         }
     }

@@ -18,7 +18,7 @@ namespace JWT.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRolesAsync()
         {
-            return Ok(await _context.Roles.AsNoTracking().ToListAsync());
+            return Ok(await _context.Roles.AsNoTracking().Include(x => x.Permissions).ToListAsync());
         }
 
         [HttpPost]
@@ -27,16 +27,16 @@ namespace JWT.Controllers
             var role = new Role();
             role.Name = roleDTO.Name;
 
-            List<Permission> permissions = new ();
+            List<Permission> permissions = new();
 
             foreach (var permission in roleDTO.Permissions)
             {
                 var storagePermission = await _context.Permissions
                     .FirstOrDefaultAsync(x => x.Id == permission);
 
-                if(storagePermission == null) 
-                    { /**/ }
-                else 
+                if (storagePermission == null)
+                { /**/ }
+                else
                     permissions.Add(storagePermission);
             }
 
@@ -49,7 +49,7 @@ namespace JWT.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync(int id,UpdateRoleDTO roleDTO)
+        public async Task<IActionResult> UpdateAsync(int id, UpdateRoleDTO roleDTO)
         {
             var role = await _context.Roles
                 .FirstOrDefaultAsync(x => x.Id == id);

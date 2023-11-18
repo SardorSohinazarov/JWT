@@ -18,27 +18,27 @@ namespace JWT.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsersAsync()
         {
-            return Ok(await _context.Users.AsNoTracking().ToListAsync());
+            return Ok(await _context.Users.AsNoTracking().Include(x => x.Roles).ToListAsync());
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync(int id,UpdateUserDTO userDTO)
+        public async Task<IActionResult> UpdateAsync(int id, UpdateUserDTO userDTO)
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(user == null) { /**/ }
+            if (user == null) { /**/ }
 
             user.Fullname = userDTO.Fullname;
             user.Username = userDTO.Username;
             user.Email = userDTO.Email;
 
-            List<Role> roles = new ();
+            List<Role> roles = new();
 
-            foreach(var role in  userDTO.Roles)
+            foreach (var role in userDTO.Roles)
             {
                 var listItem = await _context.Roles.FirstOrDefaultAsync(x => x.Id == role);
-                if(listItem == null) { /**/ }
+                if (listItem == null) { /**/ }
                 else
                 {
                     roles.Add(listItem);

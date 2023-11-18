@@ -42,9 +42,9 @@ namespace JWT.Controllers
             return Ok(
             new TokenDTO()
             {
-                 AccessToken = _jwtTokenService.GenerateJWT(user),
-                 RefreshToken = user.RefreshToken,
-                 ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2),
+                AccessToken = _jwtTokenService.GenerateJWT(user),
+                RefreshToken = user.RefreshToken,
+                ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2),
             }
             );
         }
@@ -88,7 +88,7 @@ namespace JWT.Controllers
                 {
                     AccessToken = _jwtTokenService.GenerateJWT(entityEntry.Entity),
                     RefreshToken = user.RefreshToken,
-                    ExpireDate = user.RefreshTokenExpireDate?? DateTime.Now.AddMinutes(2),
+                    ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2),
                 }
                );
         }
