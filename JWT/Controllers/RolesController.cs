@@ -8,11 +8,11 @@ namespace JWT.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class RoleController : ControllerBase
+    public class RolesController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public RoleController(AppDbContext context)
+        public RolesController(AppDbContext context)
             => _context = context;
 
         [HttpGet]
