@@ -5,7 +5,6 @@ using JWT.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Security.Claims;
 
 namespace JWT.Controllers
@@ -46,7 +45,7 @@ namespace JWT.Controllers
                  AccessToken = _jwtTokenService.GenerateJWT(user),
                  RefreshToken = user.RefreshToken,
                  ExpireDate = user.RefreshTokenExpireDate ?? DateTime.Now.AddMinutes(2),
-             }
+            }
             );
         }
 
@@ -61,13 +60,25 @@ namespace JWT.Controllers
                 Fullname = registerDTO.Fullname,
                 Email = registerDTO.Email,
                 Username = registerDTO.Username,
-                Role = registerDTO.Role,
                 Salt = salt,
                 PasswordHash = PasswordHash,
                 RefreshToken = Guid.NewGuid().ToString(),
                 RefreshTokenExpireDate = DateTime.Now.AddMinutes(2)
             };
 
+            List<Role> roles = new();
+
+            foreach (var role in registerDTO.Roles)
+            {
+                var listItem = await _context.Roles.FirstOrDefaultAsync(x => x.Id == role);
+                if (listItem == null) { /**/ }
+                else
+                {
+                    roles.Add(listItem);
+                }
+            }
+
+            user.Roles = roles;
 
             var entityEntry = await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
