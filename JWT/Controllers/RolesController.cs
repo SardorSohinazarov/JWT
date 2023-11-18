@@ -27,6 +27,21 @@ namespace JWT.Controllers
             var role = new Role();
             role.Name = roleDTO.Name;
 
+            List<Permission> permissions = new ();
+
+            foreach (var permission in roleDTO.Permissions)
+            {
+                var storagePermission = await _context.Permissions
+                    .FirstOrDefaultAsync(x => x.Id == permission);
+
+                if(storagePermission == null) 
+                    { /**/ }
+                else 
+                    permissions.Add(storagePermission);
+            }
+
+            role.Permissions = permissions;
+
             var newRole = await _context.Roles.AddAsync(role);
             await _context.SaveChangesAsync();
 
@@ -42,6 +57,21 @@ namespace JWT.Controllers
             if (role == null) { /**/ }
 
             role.Name = roleDTO.Name;
+
+            List<Permission> permissions = new();
+
+            foreach (var permission in roleDTO.Permissions)
+            {
+                var storagePermission = await _context.Permissions
+                    .FirstOrDefaultAsync(x => x.Id == permission);
+
+                if (storagePermission == null)
+                { /**/ }
+                else
+                    permissions.Add(storagePermission);
+            }
+
+            role.Permissions = permissions;
 
             var entityEntry = _context.Update(role);
             await _context.SaveChangesAsync();
