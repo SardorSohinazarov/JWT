@@ -48,11 +48,22 @@ namespace JWT.Services
 
         public string GenerateJWT(User user)
         {
-            var claims = new List<Claim>
+            List<string> permissions = new();
+
+            foreach(var role in user.Roles)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                //new Claim(ClaimTypes.Role, user.Roles),
-            };
+                var rolePermissions = _context.Permissions.Where(x => x.Id  == role.Id).Select(x => x.Name).ToList();
+                permissions.AddRange(rolePermissions);
+            }
+
+            var claims = new List<Claim>();
+
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+            foreach(var p in permissions)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, p));
+            }            
 
             return GenerateJWT(claims);
         }

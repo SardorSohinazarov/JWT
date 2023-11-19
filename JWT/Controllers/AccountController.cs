@@ -30,7 +30,7 @@ namespace JWT.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            var user = await _context.Users
+            var user = await _context.Users.Include(x => x.Roles)
                 .FirstOrDefaultAsync(user => user.Username == loginDTO.Username);
 
             if (user == null)
@@ -101,7 +101,7 @@ namespace JWT.Controllers
             return Ok(token);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "CreateUser")]
         [HttpGet]
         public async Task<IActionResult> GetUser()
         {
