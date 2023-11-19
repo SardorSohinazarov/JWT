@@ -2,13 +2,12 @@
 
 namespace JWT.Entities
 {
-    public class Role
+    public class Permission
     {
         public int Id { get; set; }
         public string Name { get; set; }
 
         [JsonIgnore]
-        public List<User> Users { get; set; }
-        public List<Permission> Permissions { get; set; }
+        public List<Role> Roles { get; set; }
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,8 +37,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IPasswordHasher,PasswordHasher>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(
@@ -48,16 +47,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             options.TokenValidationParameters = GetTokenValidationParameters(builder.Configuration);
 
             options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = (context) =>
                 {
-                    OnAuthenticationFailed = (context) =>
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                     {
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            context.Response.Headers.Add("IsTokenExpired", "true");
-                        }
-                        return Task.CompletedTask;
+                        context.Response.Headers.Add("IsTokenExpired", "true");
                     }
-                };
+                    return Task.CompletedTask;
+                }
+            };
         });
 
 var app = builder.Build();

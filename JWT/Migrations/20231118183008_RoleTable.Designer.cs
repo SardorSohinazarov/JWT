@@ -4,6 +4,7 @@ using JWT.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JWT.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231118183008_RoleTable")]
+    partial class RoleTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace JWT.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("JWT.Entities.Permission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Permissions");
-                });
 
             modelBuilder.Entity("JWT.Entities.Role", b =>
                 {
@@ -95,21 +81,6 @@ namespace JWT.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("RolePermission", b =>
-                {
-                    b.Property<int>("PermissionsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PermissionsId", "RolesId");
-
-                    b.HasIndex("RolesId");
-
-                    b.ToTable("RolePermission");
-                });
-
             modelBuilder.Entity("UserRole", b =>
                 {
                     b.Property<int>("RolesId")
@@ -123,21 +94,6 @@ namespace JWT.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("UserRole");
-                });
-
-            modelBuilder.Entity("RolePermission", b =>
-                {
-                    b.HasOne("JWT.Entities.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("PermissionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JWT.Entities.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RolesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("UserRole", b =>

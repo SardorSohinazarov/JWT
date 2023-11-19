@@ -12,6 +12,6 @@
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpireDate { get; set; }
 
-        public Role Role { get; set; }
+        public List<Role> Roles { get; set; }
     }
 }
