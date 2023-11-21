@@ -2,3 +2,6 @@
 using JWT Bearer
 
 # > JWT orqali authorization qilishga yo'naltirilgan repository
+
+- [x] Practice with Access Token
+- [x] Practice with Refresh Token
