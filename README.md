@@ -1,4 +1,4 @@
 # JWT
 using JWT Bearer
 
-> # - JWT orqali authorization qilishga yo'naltirilgan repository
+# > JWT orqali authorization qilishga yo'naltirilgan repository
