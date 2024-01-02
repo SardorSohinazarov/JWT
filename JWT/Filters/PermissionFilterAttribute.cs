@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace JWT.Filters
 {
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class PermissionFilterAttribute : Attribute, IAuthorizationFilter
     {
         private readonly string _permission;
