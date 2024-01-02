@@ -103,9 +103,10 @@ namespace JWT.Controllers
 
         //[Authorize(Roles = "CreateUser")]
         [PermissionFilter(permission: "CreateUser")]
+        [LoggerFilter]
         [MemCacheFilter]
-        [HttpGet]
-        public async Task<IActionResult> GetUser()
+        [HttpPost]
+        public async Task<IActionResult> TestAction([FromBody] string name)
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
 
