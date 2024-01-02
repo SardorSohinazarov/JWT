@@ -103,6 +103,7 @@ namespace JWT.Controllers
 
         //[Authorize(Roles = "CreateUser")]
         [PermissionFilter(permission: "CreateUser")]
+        [MemCacheFilter]
         [HttpGet]
         public async Task<IActionResult> GetUser()
         {
