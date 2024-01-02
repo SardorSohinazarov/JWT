@@ -7,9 +7,13 @@ namespace JWT.Filters
     public class PermissionFilterAttribute : Attribute, IAuthorizationFilter
     {
         private readonly string _permission;
+        private readonly string _key;
 
-        public PermissionFilterAttribute(string permission)
-            => _permission = permission;
+        public PermissionFilterAttribute(string permission, string key = "permission")
+        {
+            _permission = permission;
+            _key = key;
+        }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -19,7 +23,7 @@ namespace JWT.Filters
                 return;
             }
 
-            var permission = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "permission" && x.Value == _permission);
+            var permission = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type == _key && x.Value == _permission);
 
             if (permission == null)
             {
