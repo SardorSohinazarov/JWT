@@ -101,10 +101,8 @@ namespace JWT.Controllers
             return Ok(token);
         }
 
-        //[Authorize(Roles = "CreateUser")]
         [PermissionFilter(permission: "CreateUser")]
         [LoggerFilter]
-        [MemCacheFilter]
         [HttpPost]
         public async Task<IActionResult> TestAction([FromBody] string name)
         {
